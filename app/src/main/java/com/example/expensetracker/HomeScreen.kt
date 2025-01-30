@@ -197,11 +197,11 @@ fun TransactionItem(title: String, amount: String, icon: Int, date: String, colo
                 )
             Spacer(modifier = Modifier.size(8.dp))
             Column {
+                Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 Text(text = date, fontSize = 12.sp)
-                Text(text = title, fontSize = 12.sp)
             }
         }
-        Text(text = amount, fontSize = 20.sp, modifier = Modifier.align(Alignment.CenterEnd), color = color)
+        Text(text = amount, fontSize = 20.sp, modifier = Modifier.align(Alignment.CenterEnd), color = color, fontWeight = FontWeight.SemiBold)
     }
 }
 
