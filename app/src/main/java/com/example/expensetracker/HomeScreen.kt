@@ -1,6 +1,5 @@
 package com.example.expensetracker
 
-import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,31 +11,36 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.example.expensetracker.data.model.ExpenseEntity
 import com.example.expensetracker.ui.theme.Zinc
+import com.example.expensetracker.viewmodel.HomeViewModel
+import com.example.expensetracker.viewmodel.HomeViewModelFactory
 
 //import androidx.constraintlayout.compose.createRefs
 
 @Composable
 fun HomeScreen() {
+    val viewModel: HomeViewModel = HomeViewModelFactory(LocalContext.current).create(HomeViewModel::class.java)
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -73,12 +77,17 @@ fun HomeScreen() {
                     modifier = Modifier.align(Alignment.CenterEnd)
                 )
             }
+            val state = viewModel.expenses.collectAsState(initial = emptyList())
+            val balance = viewModel.getBalance(state.value)
+            val totalExpense = viewModel.getTotalExpense(state.value)
+            val totalIncome = viewModel.getTotalIncome(state.value)
+
             CardIem(modifier = Modifier
                 .constrainAs(card) {
                     top.linkTo(nameRow.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }
+                }, balance, totalExpense, totalIncome
             )
             TransactionList(modifier = Modifier
                 .fillMaxWidth()
@@ -88,7 +97,7 @@ fun HomeScreen() {
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
                     height = Dimension.fillToConstraints
-                }
+                }, list = state.value , viewModel
 
             )
         }
@@ -97,7 +106,7 @@ fun HomeScreen() {
 
 
 @Composable
-fun CardIem(modifier: Modifier) {
+fun CardIem(modifier: Modifier, balance: String, totalExpense: String, totalIncome: String) {
     Column ( modifier = modifier
         .padding(16.dp)
         .fillMaxWidth()
@@ -124,9 +133,9 @@ fun CardIem(modifier: Modifier) {
         Box (modifier = Modifier
             .fillMaxWidth()
             .weight(1f)){
-            CardRowItem(title = "Income", amount = "$23,000", modifier = Modifier.align(Alignment.CenterStart), image = R.drawable.ic_income,)
+            CardRowItem(title = "Income", amount = totalIncome, modifier = Modifier.align(Alignment.CenterStart), image = R.drawable.ic_income,)
 
-            CardRowItem(title = "Expense", amount = "$12,000", modifier = Modifier.align(Alignment.CenterEnd), image = R.drawable.ic_expense)
+            CardRowItem(title = "Expense", amount = totalExpense, modifier = Modifier.align(Alignment.CenterEnd), image = R.drawable.ic_expense)
         }
     }
 }
@@ -147,44 +156,27 @@ fun CardRowItem(modifier: Modifier, title: String, amount: String, image: Int) {
 }
 
 @Composable
-fun TransactionList(modifier: Modifier) {
-Column (modifier = modifier.padding(16.dp)) {
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Text(text = "Recent Transactions", fontSize = 20.sp)
-        Text(
-            text = "See All",
-            fontSize = 16.sp,
-            modifier = Modifier.align(Alignment.CenterEnd),
+fun TransactionList(modifier: Modifier, list: List<ExpenseEntity>, viewModel: HomeViewModel) {
+LazyColumn (modifier = modifier.padding(16.dp)) {
+    item {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(text = "Recent Transactions", fontSize = 20.sp)
+            Text(
+                text = "See All",
+                fontSize = 16.sp,
+                modifier = Modifier.align(Alignment.CenterEnd),
+            )
+        }
+    }
+    items(list) { item->
+        TransactionItem(
+            title = item.title,
+            amount = item.amount.toString(),
+            icon = viewModel.getItemIcon(item),
+            date = item.date.toString(),
+            color = if (item.type == "Income") Color.Green else Color.Red,
         )
     }
-    TransactionItem(
-        title = "Netflix",
-        amount = "-$ 200.00",
-        icon = R.drawable.ic_netflix,        date = "Today",
-        color = Color.Red
-    )
-    TransactionItem(
-        title = "Netflix",
-        amount = "-$ 200.00",
-        icon = R.drawable.ic_youtube,
-        date = "Today",
-        color = Color.Red
-    )
-    TransactionItem(
-        title = "Netflix",
-        amount = "-$ 200.00",
-        icon = R.drawable.ic_paypal,
-        date = "Today",
-        color = Color.Red
-    )
-    TransactionItem(
-        title = "Netflix",
-        amount = "-$ 200.00",
-        icon = R.drawable.ic_upwork,
-        date = "Today",
-        color = Color.Red
-    )
-
 }
 }
 
