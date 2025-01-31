@@ -2,7 +2,7 @@
 
 * Working with the Room Database
 * Faced Issues with kapt/ksp, also depreciated gradle and also version not supported
-* \`\`\`language
+* \```
   object Utils {
 
   fun formateDateToHumanReadableForm(dateInMillis: Long): String {
@@ -10,7 +10,7 @@
   return dateFormatter.format(dateInMillis)
   }
   }
-  \`\`\`
+  \```
 
 The dateFormatter creates an instance of SimpleDateFormat with the pattern dd/MM/yyyy to format the date
 Locale.getDefault() sets the locale of the device, ensuring the formatting is suitable for user's region.
