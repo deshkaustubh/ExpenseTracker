@@ -1,7 +1,6 @@
 package com.example.expensetracker.viewmodel
 
 import android.content.Context
-import androidx.compose.animation.core.rememberTransition
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.expensetracker.R
@@ -51,7 +50,7 @@ class HomeViewModel(dao: ExpenseDao): ViewModel() {
 class HomeViewModelFactory(private val context: Context): ViewModelProvider.Factory {
     override fun <T: ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            val dao = ExpenseDataBase.getDatabase(context).expenseDao()
+            val dao = ExpenseDataBase.getInstance(context).expenseDao()
             @Suppress("UNCHECKED_CAST")
             return HomeViewModel(dao) as T
         }

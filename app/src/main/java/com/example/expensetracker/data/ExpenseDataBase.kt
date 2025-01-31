@@ -19,7 +19,7 @@ abstract class ExpenseDataBase: RoomDatabase() {
         const val DATABASE_NAME = "expense_database"
 
         @JvmStatic
-        fun getDatabase(context: Context): ExpenseDataBase {
+        fun getInstance(context: Context): ExpenseDataBase {
             return Room.databaseBuilder(
                 context,
                 ExpenseDataBase::class.java,
@@ -32,11 +32,11 @@ abstract class ExpenseDataBase: RoomDatabase() {
 
                 fun InitBasicData(context: Context) {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val dao = getDatabase(context).expenseDao()
-                        dao.insertExpense(ExpenseEntity(1, "Salary", 500000.00, System.currentTimeMillis(), "Salary", "Income"))
-                        dao.insertExpense(ExpenseEntity(2, "Paypal", 1000.00, System.currentTimeMillis(),"Paypal", "Income"))
-                        dao.insertExpense(ExpenseEntity(3, "Netflix", 1000.00, System.currentTimeMillis(), "Netflix", "Expense"))
-                        dao.insertExpense(ExpenseEntity(4, "Starbucks", 500000.00, System.currentTimeMillis(), "Starbucks", "Expense"))
+                        val dao = getInstance(context).expenseDao()
+//                        dao.insertExpense(ExpenseEntity(1, "Salary", 500000.00, System.currentTimeMillis(), "Salary", "Income"))
+//                        dao.insertExpense(ExpenseEntity(2, "Paypal", 1000.00, System.currentTimeMillis(),"Paypal", "Income"))
+//                        dao.insertExpense(ExpenseEntity(3, "Netflix", 1000.00, System.currentTimeMillis(), "Netflix", "Expense"))
+//                        dao.insertExpense(ExpenseEntity(4, "Starbucks", 500000.00, System.currentTimeMillis(), "Starbucks", "Expense"))
                     }
                 }
             }

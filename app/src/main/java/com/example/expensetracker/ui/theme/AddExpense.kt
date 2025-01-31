@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -17,35 +16,46 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.expensetracker.R
 import com.example.expensetracker.Utils
+import com.example.expensetracker.data.model.ExpenseEntity
+import com.example.expensetracker.viewmodel.AddExpenseViewModel
+import com.example.expensetracker.viewmodel.AddExpenseViewModelFactory
 import com.example.expensetracker.widget.ExpenseTextView
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun AddExpense() {
+    val viewModel = AddExpenseViewModelFactory(LocalContext.current).create(AddExpenseViewModel::class.java)
+    val coroutineScope = rememberCoroutineScope()
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -97,14 +107,18 @@ fun AddExpense() {
                         top.linkTo(nameRow.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
-                    }
+                    }, onADdExpenseClick = {
+                        coroutineScope.launch {
+                            viewModel.addExpense(it)
+                        }
+                }
             )
         } // -> Constraint Layout
     } // -> Surface
 } // -> Add Expense
 
 @Composable
-fun DataForm(modifier: Modifier) {
+fun DataForm(modifier: Modifier, onADdExpenseClick: (model : ExpenseEntity) -> Unit) {
     val name = remember {
         mutableStateOf("")
     }
@@ -112,10 +126,16 @@ fun DataForm(modifier: Modifier) {
         mutableStateOf("")
     }
     val date = remember {
-        mutableStateOf(0L)
+        mutableStateOf<Long>(0L)
     }
     val dateDialogVisibility = remember {
         mutableStateOf(false)
+    }
+    val category = remember {
+        mutableStateOf("")
+    }
+    val type = remember {
+        mutableStateOf("")
     }
 
     Column(
@@ -142,7 +162,7 @@ fun DataForm(modifier: Modifier) {
         OutlinedTextField(
             value = amount.value,
             onValueChange = {
-                name.value = it
+                amount.value = it
             }, modifier = Modifier.fillMaxWidth())
 
         //date
@@ -158,11 +178,32 @@ fun DataForm(modifier: Modifier) {
         )
 
         // dropdown
-
+        ExpenseTextView(text = "Category", fontSize = 14.sp)
+        Spacer(modifier = Modifier.size(8.dp))
+ExpenseDropDown(
+    listOf("Netflix", "Paypal", "Starbucks", "Salary", "Upwork"),
+        onItemsSelected = {
+        category.value = it
+    }
+)
         //type
 
+        ExpenseTextView(text =  "Type", fontSize = 14.sp)
+        Spacer(modifier= Modifier.size(8.dp))
+        ExpenseDropDown(
+            listOf("Income", "Expense"),
+            onItemsSelected = {
+                type.value = it
+            }
+        )
+
         Button(
-            onClick = { },
+            onClick = {
+                val model = ExpenseEntity(
+                    null, name.value, amount.value.toDoubleOrNull() ?: 0.0, Utils.formateDateToHumanReadableForm(date.value), category.value, type.value
+                )
+                onADdExpenseClick(model)
+            },
             modifier = Modifier
                 .clip(RoundedCornerShape(2.dp))
                 .fillMaxWidth()
@@ -207,10 +248,36 @@ fun ExpenseDatePickerDialog(
         }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpenseDropDown(listOfItems: List<String>, onItemsSelected: (item: String) -> Unit) {
     val expanded = remember {
         mutableStateOf(false)
+    }
+    val selectedItem = remember {
+        mutableStateOf<String>(listOfItems[0])
+    }
+    ExposedDropdownMenuBox(expanded = expanded.value, onExpandedChange = { expanded.value = it }) {
+        TextField(value = selectedItem.value, onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            readOnly = true,
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value)
+            }
+        )
+        ExposedDropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false }) {
+            listOfItems.forEach { item ->
+                DropdownMenuItem(text = { Text(text = item) }, onClick = {
+                    selectedItem.value = item
+                    onItemsSelected(item)
+                    expanded.value = false
+                })
+            }
+        }
     }
 }
 
