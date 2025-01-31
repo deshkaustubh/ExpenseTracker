@@ -2,7 +2,7 @@
 
 * Working with the Room Database
 * Faced Issues with kapt/ksp, also depreciated gradle and also version not supported
-* \```
+* \```kotlin
   object Utils {
 
   fun formateDateToHumanReadableForm(dateInMillis: Long): String {
