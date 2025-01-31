@@ -208,6 +208,13 @@ fun ExpenseDatePickerDialog(
 }
 
 @Composable
+fun ExpenseDropDown(listOfItems: List<String>, onItemsSelected: (item: String) -> Unit) {
+    val expanded = remember {
+        mutableStateOf(false)
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 fun PreviewAddExpense() {
     AddExpense()
