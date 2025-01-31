@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.expensetracker.R
+import com.example.expensetracker.Utils
 import com.example.expensetracker.widget.ExpenseTextView
 
 
@@ -148,7 +149,8 @@ fun DataForm(modifier: Modifier) {
         ExpenseTextView(text = "Date", fontSize = 14.sp)
         Spacer(modifier = Modifier.size(8.dp))
         OutlinedTextField(
-            value = date.value.toString(),
+            value = if(date.value == 0L) "" else Utils.formateDateToHumanReadableForm(date.value),
+            onValueChange = {},
              modifier = Modifier
                 .fillMaxWidth()
                 .clickable { dateDialogVisibility.value = true },
@@ -173,7 +175,7 @@ fun DataForm(modifier: Modifier) {
         }
         if(dateDialogVisibility.value) {
             ExpenseDatePickerDialog(onDateSelected = {date.value = it
-                                                     dateDialogVisibility = false
+                                                     dateDialogVisibility.value = false
                                                      }, onDismiss = {
                                                          dateDialogVisibility.value =false
             })
@@ -210,3 +212,4 @@ fun ExpenseDatePickerDialog(
 fun PreviewAddExpense() {
     AddExpense()
 }
+
