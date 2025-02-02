@@ -200,7 +200,12 @@ ExpenseDropDown(
         Button(
             onClick = {
                 val model = ExpenseEntity(
-                    null, name.value, amount.value.toDoubleOrNull() ?: 0.0, Utils.formateDateToHumanReadableForm(date.value), category.value, type.value
+                    null,
+                    name.value,
+                    amount.value.toDoubleOrNull() ?: 0.0,
+                    Utils.formateDateToHumanReadableForm(date.value),
+                    category.value,
+                    type.value
                 )
                 onADdExpenseClick(model)
             },
